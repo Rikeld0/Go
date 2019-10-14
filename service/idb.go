@@ -1,4 +1,4 @@
-package idb
+package service
 
 import (
 	"database/sql"
@@ -24,6 +24,7 @@ func Close() {
 func Get(url string) string {
 	rows, _ := db.Query("SELECT status FROM resources WHERE url='" + url + "'")
 	var statusres string
+	statusres = "404 FATAL"
 	for rows.Next() {
 		rows.Scan(&statusres)
 		fmt.Printf("%s\n", statusres)

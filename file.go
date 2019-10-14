@@ -6,14 +6,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	idb "./service"
+	"./service"
 )
 
 func main() {
-	idb.Init()
-	defer idb.Close()
+	service.Init()
+	defer service.Close()
 	availabilityResources()
-	getResources()
+	//getResources()
+	service.Run()
 }
 
 //Emulation request from the outside
@@ -33,12 +34,12 @@ func availabilityResources() {
 		} else {
 			r = resp.Status
 		}
-		idb.Put(url, r)
+		service.Put(url, r)
 	}
 
 }
 
-func getResources() {
+/*func getResources() {
 	data, _ := ioutil.ReadFile("list.json")
 	fmt.Println(string(data))
 
@@ -47,6 +48,6 @@ func getResources() {
 	q := ss["list"].([]interface{})
 	for _, v := range q {
 		url := "https://" + v.(string)
-		idb.Get(url)
+		service.Get(url)
 	}
-}
+}*/
