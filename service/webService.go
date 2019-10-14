@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	mux "github.com/gorilla/mux"
@@ -24,8 +25,11 @@ func (srv *httpService) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	buf := req.URL.String()
 	paramPars, _ := url.Parse(buf)
 	paramURL := paramPars.Query().Get("url")
-	//TODO: filter(')
-	status := &jsonStruct{Status: Get(paramURL)}
+	paramURLr := strings.Replace(paramURL, "'", "", len(paramURL))
+	if paramURLr != paramURL || len(paramURL) == 0 {
+		return
+	}
+	status := &jsonStruct{Status: Get(paramURLr)}
 	JSON, _ := json.Marshal(status)
 	fmt.Fprint(resp, string(JSON))
 }
