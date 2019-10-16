@@ -9,14 +9,16 @@ import (
 	"os/signal"
 	"syscall"
 
+	"./log"
+
 	"./service"
 )
 
 func main() {
 	service.Init()
+	log.Init()
 	defer service.Close()
 	availabilityResources()
-	//getResources()
 	service.Run()
 
 	c := make(chan os.Signal)
@@ -29,7 +31,7 @@ func main() {
 func availabilityResources() {
 	data, err := ioutil.ReadFile("list.json")
 	if err != nil {
-		service.LogG.Error("file not found")
+		log.Fatal("json file not found")
 	}
 	fmt.Println(string(data))
 

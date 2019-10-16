@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"../log"
 	//sqlite3
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -21,7 +22,7 @@ func Init() {
 	var err error
 	db, err = sql.Open("sqlite3", "./mydb.db")
 	if err != nil {
-		panic(err)
+		log.Fatal("Error open database.")
 	}
 }
 
@@ -34,7 +35,7 @@ func Close() {
 func (*idb) Get(url string) string {
 	rows, err := db.Query("SELECT status FROM resources WHERE url='" + url + "'")
 	if err != nil {
-		LogG.Error("error")
+		log.Warn("Error request query in database.")
 	}
 	var statusres string
 	statusres = "404 FATAL"
@@ -53,18 +54,22 @@ func (*idb) Put(url, status string) bool {
 		status TEXT)`
 	st, err := db.Prepare(table)
 	if err != nil {
+		log.Warn("Error request in database.")
 		return false
 	}
 	_, err = st.Exec()
 	if err != nil {
+		log.Warn("Error request in database")
 		return false
 	}
 	st, err = db.Prepare("INSERT INTO resources (url, status) VALUES (?, ?)")
 	if err != nil {
+		log.Warn("Error request in database.")
 		return false
 	}
 	_, err = st.Exec(url, status)
 	if err != nil {
+		log.Warn("Error request in database.")
 		return false
 	}
 	return true

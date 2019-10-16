@@ -7,6 +7,8 @@ import (
 	"net/url"
 	"strings"
 
+	"../log"
+
 	mux "github.com/gorilla/mux"
 )
 
@@ -22,24 +24,25 @@ func (srv *httpService) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	buf := req.URL.String()
 	paramPars, err := url.Parse(buf)
 	if err != nil {
-		LogG.Error("error")
+		log.Info("Error parse.")
 	}
 	paramURL := paramPars.Query().Get("url")
 	paramURLr := strings.Replace(paramURL, "'", "", len(paramURL))
 	if paramURLr != paramURL || len(paramURL) == 0 {
+		log.Info("Request contained \"'\".")
 		return
 	}
 	status := &jsonStruct{Status: Db.Get(paramURLr)}
 	JSON, err1 := json.Marshal(status)
 	if err1 != nil {
-		LogG.Error("error")
+		log.Info("Error marshal.")
 	}
 	fmt.Fprint(resp, string(JSON))
 }
 
 func (srv *httpService) Start() {
 	if srv.server != nil {
-		panic("Server already started.")
+		log.Fatal("Server already started.")
 	}
 
 	router := mux.NewRouter()
@@ -53,7 +56,7 @@ func (srv *httpService) Start() {
 
 	go func() {
 		if err := srv.server.ListenAndServe(); err != nil {
-			panic("Failed to listen.")
+			log.Fatal("Failed to listen.")
 		}
 	}()
 }
