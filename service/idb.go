@@ -8,11 +8,21 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+var Db Idb = &idb{}
+
+type idb struct {
+	Idb
+}
+
 var db *sql.DB
 
 //Init ...
 func Init() {
-	db, _ = sql.Open("sqlite3", "./mydb.db")
+	var err error
+	db, err = sql.Open("sqlite3", "./mydb.db")
+	if err != nil {
+		panic(err)
+	}
 }
 
 //Close ...
@@ -21,8 +31,11 @@ func Close() {
 }
 
 //Get ...
-func Get(url string) string {
-	rows, _ := db.Query("SELECT status FROM resources WHERE url='" + url + "'")
+func (*idb) Get(url string) string {
+	rows, err := db.Query("SELECT status FROM resources WHERE url='" + url + "'")
+	if err != nil {
+		LogG.Error("error")
+	}
 	var statusres string
 	statusres = "404 FATAL"
 	for rows.Next() {
@@ -33,7 +46,7 @@ func Get(url string) string {
 }
 
 //Put ...
-func Put(url, status string) bool {
+func (*idb) Put(url, status string) bool {
 	table := `CREATE TABLE IF NOT EXISTS resources (
 		id INTEGER PRIMARY KEY,
 		url TEXT,

@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"./service"
 )
@@ -15,11 +18,19 @@ func main() {
 	availabilityResources()
 	//getResources()
 	service.Run()
+
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	fmt.Println("Press Ctrl+C for quit.")
+	<-c
 }
 
 //Emulation request from the outside
 func availabilityResources() {
-	data, _ := ioutil.ReadFile("list.json")
+	data, err := ioutil.ReadFile("list.json")
+	if err != nil {
+		service.LogG.Error("file not found")
+	}
 	fmt.Println(string(data))
 
 	var ss map[string]interface{}
@@ -34,7 +45,7 @@ func availabilityResources() {
 		} else {
 			r = resp.Status
 		}
-		service.Put(url, r)
+		service.Db.Put(url, r)
 	}
 
 }

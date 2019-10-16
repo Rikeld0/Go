@@ -5,10 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 
 	mux "github.com/gorilla/mux"
 )
@@ -23,14 +20,20 @@ type jsonStruct struct {
 
 func (srv *httpService) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
 	buf := req.URL.String()
-	paramPars, _ := url.Parse(buf)
+	paramPars, err := url.Parse(buf)
+	if err != nil {
+		LogG.Error("error")
+	}
 	paramURL := paramPars.Query().Get("url")
 	paramURLr := strings.Replace(paramURL, "'", "", len(paramURL))
 	if paramURLr != paramURL || len(paramURL) == 0 {
 		return
 	}
-	status := &jsonStruct{Status: Get(paramURLr)}
-	JSON, _ := json.Marshal(status)
+	status := &jsonStruct{Status: Db.Get(paramURLr)}
+	JSON, err1 := json.Marshal(status)
+	if err1 != nil {
+		LogG.Error("error")
+	}
 	fmt.Fprint(resp, string(JSON))
 }
 
@@ -60,9 +63,4 @@ func Run() {
 	server := httpService{}
 	fmt.Println("Server is listening...")
 	server.Start()
-
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	fmt.Println("Press Ctrl+C for quit.")
-	<-c
 }
