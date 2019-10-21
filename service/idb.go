@@ -46,6 +46,21 @@ func (*idb) Get(url string) string {
 	return statusres
 }
 
+func (*idb) GetAll() []string {
+	var list []string
+	rows, err := db.Query("SELECT url FROM resources")
+	if err != nil {
+		log.Warn("Error requset query in database")
+	} else {
+		for rows.Next() {
+			var buf string
+			rows.Scan(&buf)
+			list = append(list, buf)
+		}
+	}
+	return list
+}
+
 //Put ...
 func (*idb) Put(url, status string) bool {
 	table := `CREATE TABLE IF NOT EXISTS resources (
