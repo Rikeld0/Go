@@ -9,8 +9,3 @@ type Idb interface {
 type Idata interface {
 	Data()
 }
-
-/*type Data interface {
-	Ss()
-	Dd()
-}*/
