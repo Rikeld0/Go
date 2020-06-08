@@ -6,23 +6,18 @@ import (
 	"os"
 )
 
-/*var LogG Logger = &err{}
-
-type err struct {
-	Logger
-}*/
 var f *os.File
 var err error
 
+//Init init func
 func Init() {
-	//create your file with desired read/write permissions
 	f, err = os.OpenFile("./file.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	//defer to close when you're done with it, not because you think it's idiomatic!
 }
 
+//Info info log
 func Info(s string) {
 	q := fmt.Sprintf("INFO: %s\n", s)
 	_, err1 := f.WriteString(q)
@@ -32,6 +27,7 @@ func Info(s string) {
 	f.Sync()
 }
 
+//Fatal fatal log
 func Fatal(s string) {
 	q := fmt.Sprintf("FATA: %s\n", s)
 	_, err1 := f.WriteString(q)
@@ -42,6 +38,7 @@ func Fatal(s string) {
 	panic("Fatal")
 }
 
+//Warn warn log
 func Warn(s string) {
 	q := fmt.Sprintf("WARN: %s\n", s)
 	_, err1 := f.WriteString(q)
